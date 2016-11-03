@@ -1,0 +1,240 @@
+body {
+  font-family: 'Elsie', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  background: #2D2125;
+}
+
+$function: cubic-bezier(.67,.01,.31,1.47);
+
+@mixin gradient() {
+  /* Gradient generated with www.colorzilla.com */
+  background: -moz-linear-gradient(top, rgba(54,34,79,1) 0%, rgba(54,34,79,0) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(54,34,79,1) 0%,rgba(54,34,79,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(54,34,79,1) 0%,rgba(54,34,79,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#36224f', endColorstr='#0036224f',GradientType=0 ); /* IE6-9 */
+}
+
+.site-main {
+  .paralax-layer {
+    top: 0;
+    bottom: 0;
+
+    transition: top 1s, bottom 1s;
+    transition-timing-function: $function;
+  }
+
+  .overlay {
+    background-color: #36224F;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100vh;
+    opacity: 0;
+    z-index: 1;
+
+    transition: opacity 1s, top 1s;
+    transition-timing-function: ease-in-out
+  }
+
+  .hamburger-menu {
+    opacity: 1;
+    transition: opacity 1s;
+  }
+
+  &.loading {
+    .paralax {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .paralax-layer {
+      top: 15vh;;
+      bottom: -15vh;
+    }
+
+    .overlay {
+      top: -15vh;
+      opacity: 1;
+    }
+
+    .hamburger-menu {
+      opacity: 0;
+    }
+  }
+}
+
+.paralax {
+  perspective: 1px;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.paralax-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.paralax-layer-top {
+  transform: translateZ(0.3px);
+}
+
+.paralax-layer-base {
+  transform: translateZ(0);
+}
+
+.paralax-layer-back {
+  transform: translateZ(-0.2px);
+}
+
+.top-content {
+  position: relative;
+
+  .photo {
+    height: 100vh;
+
+    .image-holder {
+      width: 150vw;
+      margin-left: -25%;
+      margin-top: -100px;
+      height: 125vh;
+      overflow: hidden;
+
+      @media(max-width:900px) {
+        margin-left: -70%;
+        width: 220vw;
+      }
+
+      @media(max-width:599px) {
+        margin-left: -140%;
+        width: 330vw;
+      }
+      img {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.site-logo {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin-top: 5vh;
+  padding-top: 13vh;
+  overflow: visible;
+  height: 300px;
+
+  @include gradient();
+
+  img {
+    display: block;
+    margin: 0 auto;
+    max-width: 200px;
+    max-height: 50vh;
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.top-navigation {
+  background-color: rgba(54,34,79,0.8);
+  position: absolute;
+  text-align: right;
+  bottom: 0;
+  height: 100px;
+  width: 100%;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  padding: 0 15px;
+
+  &, a {
+    color: #EDB526;
+  }
+
+  img {
+    float: left;
+    width: 328px;
+    
+    @media(max-width:767px) {
+      float: none;
+      display: block;
+      margin: 10px auto 0; 
+      width: 250px; 
+    }
+  }
+
+  ul {
+    margin: 60px 0 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: inline-block;
+      margin: 0 0 0 20px;
+
+      @media(max-width:600px) {
+        margin: 0 0 0 10px;
+      }
+    }
+  }
+
+  &.hamburger-menu {
+    @include gradient();
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    height: 40px;
+    z-index: 100;
+
+    .hamburger-menu-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5em;
+      z-index: 2;
+    }
+
+    nav {
+      background: rgba(54,34,79,0.8);
+      position: fixed;
+      top: 0;
+      left: -100vw;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      transition: left 0.5s;
+      z-index: 1;
+
+      ul {
+        li {
+          display: block;
+          font-size: 1.5em;
+          margin: 0 0 20px 0;
+        }
+      }
+    }
+
+    &.open {
+      nav {
+        left: 0;
+      }
+    }
+  }
+}
+
+.content {
+  padding: 50px 0;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  color: #EDB526;
+  background: #36224F;
+}
