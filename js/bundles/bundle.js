@@ -50,9 +50,41 @@
 
 	var _countdown2 = _interopRequireDefault(_countdown);
 
+	var _menus = __webpack_require__(109);
+
+	var _menus2 = _interopRequireDefault(_menus);
+
+	var _transitions = __webpack_require__(110);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
+	var _rsvp = __webpack_require__(111);
+
+	var _rsvp2 = _interopRequireDefault(_rsvp);
+
+	var _gallery = __webpack_require__(112);
+
+	var _gallery2 = _interopRequireDefault(_gallery);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	(0, _countdown2.default)(document.getElementsByClassName('countdown'));
+	(function ($) {
+	  $(document).ready(function () {
+	    (0, _countdown2.default)('.countdown');
+	    (0, _menus2.default)();
+	    (0, _rsvp2.default)();
+	    (0, _gallery2.default)('.galeria');
+
+	    // Remove loading state and initialize the show!
+	    setTimeout(function () {
+	      $('.site-main').removeClass('loading');
+	      (0, _transitions2.default)();
+	      setTimeout(function () {
+	        $('.overlay').remove();
+	      }, 1000);
+	    }, 1000);
+	  });
+	})(window.jQuery);
 
 /***/ },
 /* 1 */
@@ -10705,6 +10737,347 @@
 
 	    return zh_tw;
 	});
+
+/***/ },
+/* 109 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.menus = menus;
+	function menus() {
+	  var $ = window.jQuery || {};
+
+	  var $menu = $('.hamburger-menu');
+
+	  var toggleMenu = function toggleMenu(e) {
+	    e.preventDefault();
+	    $menu.toggleClass('open');
+	  };
+
+	  var closeMenu = function closeMenu() {
+	    $menu.removeClass('open');
+	  };
+
+	  var scrollToAnchor = function scrollToAnchor(e) {
+	    var href = $(e.target).attr('href');
+	    if (!href || href === '#') {
+	      return true;
+	    }
+
+	    e.preventDefault();
+
+	    closeMenu();
+
+	    var $target = $('a[name=' + href.substring(1) + ']');
+
+	    if (!$target.length) {
+	      return false;
+	    }
+
+	    var anchorTop = $target.offset().top;
+	    $('.parallax, body').animate({ scrollTop: anchorTop }, 1000);
+	    return true;
+	  };
+
+	  $('a[href*=#]').on('click', scrollToAnchor);
+
+	  $('.hamburger-menu-button').off('click').on('click', toggleMenu);
+	}
+
+	exports.default = menus;
+
+/***/ },
+/* 110 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	exports.default = function () {
+	  calculatePositions();
+
+	  $(window).on('resize', function () {
+	    calculatePositions();
+	  });
+
+	  // Calls emmitTriggers and receives newly emmitted triggers. It then calls the functions
+	  // of each trigger that was emmitted in this cycle.
+	  var intervalFunc = function intervalFunc() {
+	    var scrollPos = $(window).scrollTop();
+	    if (!scrollPos) {
+	      scrollPos = $('.parallax').scrollTop();
+	    }
+	    var newTriggers = emmitTriggers(scrollPos);
+	    if (newTriggers.length) {
+	      newTriggers.forEach(function (emittedTrigger) {
+	        var trigger = triggers.reduce(function (prev, curr) {
+	          if (!prev && curr.name === emittedTrigger) {
+	            return curr;
+	          }
+	          return prev || null;
+	        }, null);
+	        if (trigger && trigger.func) {
+	          trigger.func();
+	          trigger.func = null;
+	        }
+	      });
+	    }
+	  };
+
+	  // Set an interval every 0.5s to check for emmitted triggers. When all triggers have been
+	  // emmitted, the interval automatically clears.
+	  var interval = setInterval(function () {
+	    intervalFunc();
+	    if (triggers.length === emittedTriggers.length) {
+	      clearInterval(interval);
+	    }
+	  }, 500);
+	};
+
+	var $ = window.jQuery || {};
+
+	// Defines the animations triggers
+	var triggers = [{
+	  name: 'arrow',
+	  element: '.parallax-layer-base',
+	  position: null,
+	  offset: -10,
+	  func: function func() {
+	    $('img.arrow').removeClass('loading');
+	  }
+	}, {
+	  name: 'countdown',
+	  element: '.countdown',
+	  position: null,
+	  offset: 400,
+	  func: function func() {
+	    setTimeout(function () {
+	      $('.countdown .faltan').removeClass('loading');
+	    }, 0);
+	    setTimeout(function () {
+	      $('.countdown .img-container').removeClass('loading');
+	    }, 0);
+	    setTimeout(function () {
+	      $('.countdown .box.hours').removeClass('loading');
+	    }, 500);
+	    setTimeout(function () {
+	      $('.countdown .box.seconds').removeClass('loading');
+	    }, 600);
+	    setTimeout(function () {
+	      $('.countdown .box.minutes').removeClass('loading');
+	    }, 550);
+	    setTimeout(function () {
+	      $('.countdown .box.days').removeClass('loading');
+	    }, 620);
+	    setTimeout(function () {
+	      $('.countdown .end-text').removeClass('loading');
+	    }, 1000);
+	  }
+	}, {
+	  name: 'rsvp',
+	  element: '.rsvp',
+	  position: null,
+	  offset: 300,
+	  func: function func() {
+	    $('.rsvp').removeClass('loading');
+	  }
+	}, {
+	  name: 'eventos',
+	  element: '.eventos',
+	  position: null,
+	  offset: 300,
+	  func: function func() {
+	    $('.eventos').removeClass('loading');
+	  }
+	}, {
+	  name: 'galeria',
+	  element: '.galeria',
+	  position: null,
+	  offset: 300,
+	  func: function func() {
+	    $('.galeria .gallery figure').each(function (index, element) {
+	      $(element).css({ transitionDelay: index * 0.1 + 's' });
+	    });
+	    $('.galeria').removeClass('loading');
+	  }
+	}];
+
+	// Holds the emmitted triggers names
+	var emittedTriggers = [];
+
+	// Calculate the triggers positions and offsets, once initially and every time window is resized
+	function calculatePositions() {
+	  if (triggers) {
+	    triggers.forEach(function (trigger, index) {
+	      var $element = $(trigger.element);
+	      if ($element.length) {
+	        triggers[index].position = $element.offset().top - triggers[index].offset;
+	      }
+	    });
+	  }
+	}
+
+	// Receives scroll position and dispatches the triggers that are within boundaries
+	function emmitTriggers(scrollPos) {
+	  return triggers && triggers.reduce(function (prev, curr) {
+	    if (scrollPos >= curr.position) {
+	      if (emittedTriggers.indexOf(curr.name) === -1) {
+	        emittedTriggers.push(curr.name);
+	      }
+	      return [].concat(prev, [curr.name]);
+	    }
+	    return prev;
+	  }, []);
+	}
+
+/***/ },
+/* 111 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.rsvp = rsvp;
+	function rsvp() {
+	  var $ = window.jQuery || {};
+
+	  var correctCopy = function correctCopy() {
+	    var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : $('article.page');
+
+	    // Correct RSVP text which is not editable in wordpress admin....
+	    if (!parent.length) {
+	      return false;
+	    }
+	    $(parent).find('label[for="firstName"]').text('Nombre:');
+	    $(parent).find('label[for="lastName"]').text('Dos Apellidos:');
+	    $(parent).find('form#rsvp input[type=submit]').attr('value', 'Enviar');
+	    $(parent).html($(parent).html().replace(/fiesta/g, '<span class="nobreak">f&#8202;iesta</span>'));
+	    $(parent).html($(parent).html().replace(/Yes/g, 'Sí'));
+	    $(parent).html($(parent).html().replace(/Hi (.*)!/g, '¡Hola, $1!'));
+	    $(parent).html($(parent).html().replace(/Welcome back (.*)!/g, '¡Bienvenido de nuevo, $1!'));
+	    $(parent).html($(parent).html().replace(/Email Address/g, 'Correo Electrónico'));
+	    $(parent).html($(parent).html().replace(/The following people .*well/g, 'Las siguientes personas están asociadas con su nombre. Usted puede RSVP por ellas a continuación, si lo desea'));
+	    $(parent).html($(parent).html().replace(/Will (.*) be attending\?/g, '¿$1 va a asistir a la boda?'));
+	    $(parent).html($(parent).html().replace(/Hi (.*) it looks like .*\?/g, 'Hola, $1. Parece que usted ya contestó a la invitación. ¿Desea editar su respuesta?'));
+
+	    // Errors
+	    $(parent).html($(parent).html().replace(/A first and last name must be specified/g, 'Por favor ponga su nombre y apellidos.'));
+	    $(parent).html($(parent).html().replace(/We could not find an .*you\?/g, 'No pudimos encontrar el nombre exacto, pero ¿es alguno de estos su nombre?'));
+	    $(parent).html($(parent).html().replace(/We were unable to find anyone with a name of (.*)/g, 'No pudimos encontrar a nadie con el nombre $1'));
+	    return true;
+	  };
+
+	  correctCopy();
+
+	  var submitHandler = function submitHandler(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+
+	    var data = $(e.target).serialize();
+
+	    $.ajax({
+	      url: $(e.target).attr('action'),
+	      type: 'POST',
+	      data: data,
+	      success: function success(response) {
+	        var $rsvpContent = $(response).find('article.page');
+	        if (!$rsvpContent.find('input[name=firstName]').length) {
+	          $rsvpContent.find('form').addClass('full-form');
+	        }
+	        correctCopy($rsvpContent);
+	        $('.rsvp-form-container').html($rsvpContent);
+	        $('.rsvp-form-container form').off('submit');
+	        $('.rsvp-form-container form').on('submit', submitHandler);
+	      }
+	    });
+
+	    return false;
+	  };
+
+	  setTimeout(function () {
+	    $('.rsvp-form-container form').off('submit');
+	    $('.rsvp-form-container form').on('submit', submitHandler);
+	  }, 1000);
+	}
+
+	exports.default = rsvp;
+
+/***/ },
+/* 112 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.gallery = gallery;
+	function gallery() {
+	  var gallerySelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.gallery';
+	  var overlaySelector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '.gallery-overlay';
+
+	  var $ = window.jQuery || {};
+
+	  var $gallery = $(gallerySelector);
+
+	  var cachedGallery = {};
+
+	  if (!$gallery.length) {
+	    return false;
+	  }
+
+	  var $overlay = $(overlaySelector);
+
+	  $overlay.on('click', function (e) {
+	    e.preventDefault();
+	    if (!$(e.target).is('img')) {
+	      $overlay.css({ display: 'none' });
+	    }
+	  });
+
+	  function appendImg(path) {
+	    var $img = $('<img>').attr('src', path);
+
+	    $overlay.find('.gallery-image').empty().append($img);
+
+	    $overlay.css({ display: 'block' }).focus();
+	  }
+
+	  $gallery.find('a').each(function (index, item) {
+	    var $link = $(item);
+	    var url = $link.attr('href');
+	    if (!url) {
+	      return true;
+	    }
+
+	    $link.on('click', function (e) {
+	      e.preventDefault();
+
+	      if (cachedGallery[url]) {
+	        appendImg(cachedGallery[url]);
+	        return true;
+	      }
+
+	      $.ajax({
+	        url: url,
+	        type: 'GET',
+	        success: function success(response) {
+	          var imgPath = $(response).find('.entry-attachment img').attr('src');
+	          cachedGallery[url] = imgPath;
+	          appendImg(imgPath);
+	        }
+	      });
+	      return true;
+	    });
+
+	    return true;
+	  });
+
+	  return true;
+	}
+
+	exports.default = gallery;
 
 /***/ }
 /******/ ]);
